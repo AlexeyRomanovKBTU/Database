@@ -1,13 +1,20 @@
+-- Name: Alexey Romanov
+-- Student ID: 202500123
+
 -- Task 1.1
+-- Demonstrates CHECK constraints for numeric ranges and salary
+
 CREATE TABLE employees (
-    employee_id INTEGER PRIMARY KEY,
+    employee_id INTEGER PRIMARY KEY, -- Unique ID for each employee
     first_name TEXT,
     last_name TEXT,
-    age INTEGER CHECK (age BETWEEN 18 AND 65),
-    salary NUMERIC CHECK (salary > 0)
+    age INTEGER CHECK (age BETWEEN 18 AND 65), -- Ensures valid working age
+    salary NUMERIC CHECK (salary > 0) -- Ensures salary is positive
 );
 
 -- Task 1.2
+-- Demonstrates multi-column CHECK constraints
+
 CREATE TABLE products_catalog (
     product_id INTEGER PRIMARY KEY,
     product_name TEXT NOT NULL,
@@ -15,20 +22,24 @@ CREATE TABLE products_catalog (
     discount_price NUMERIC NOT NULL,
     CONSTRAINT valid_discount CHECK (
         regular_price > 0 AND discount_price > 0 AND discount_price < regular_price
-    )
+    ) -- Ensures both prices are positive and discount < regular
 );
 
 -- Task 1.3
+-- Demonstrates date and numeric range checks
+
 CREATE TABLE bookings (
     booking_id INTEGER PRIMARY KEY,
     check_in_date DATE NOT NULL,
     check_out_date DATE NOT NULL,
     num_guests INTEGER NOT NULL,
-    CONSTRAINT chk_guests CHECK (num_guests BETWEEN 1 AND 10),
-    CONSTRAINT chk_dates CHECK (check_out_date > check_in_date)
+    CONSTRAINT chk_guests CHECK (num_guests BETWEEN 1 AND 10), -- Guests between 1–10
+    CONSTRAINT chk_dates CHECK (check_out_date > check_in_date) -- Check-out must be after check-in
 );
 
 -- Task 1.4
+-- Inserting valid and invalid data into employees, products_catalog, bookings
+
 INSERT INTO employees VALUES
 (1, 'Aidar', 'Zhaksylykov', 28, 3500),
 (2, 'Nurgul', 'Sariyeva', 45, 7200),
@@ -36,9 +47,8 @@ INSERT INTO employees VALUES
 (4, 'Dana', 'Kenzhebek', 54, 6800),
 (5, 'Serik', 'Abdulla', 22, 2900);
 
--- invalid test (age and salary)
-INSERT INTO employees VALUES
-(6, 'Timur', 'Seitov', 17, -2000);
+-- Invalid Test (age below 18 and negative salary) - Fails CHECK constraints
+INSERT INTO employees VALUES (6, 'Timur', 'Seitov', 17, -2000);
 
 INSERT INTO products_catalog VALUES
 (1, 'Backpack', 50, 40),
@@ -47,9 +57,8 @@ INSERT INTO products_catalog VALUES
 (4, 'Pencil', 2, 1),
 (5, 'Water Bottle', 10, 8);
 
--- invalid test (price)
-INSERT INTO products_catalog VALUES
-(6, 'Pen', 0, -10);
+-- Invalid Test (zero and negative prices)
+INSERT INTO products_catalog VALUES (6, 'Pen', 0, -10);
 
 INSERT INTO bookings VALUES
 (1, '2025-11-01', '2025-11-05', 2),
@@ -58,28 +67,33 @@ INSERT INTO bookings VALUES
 (4, '2025-09-05', '2025-09-10', 5),
 (5, '2025-08-15', '2025-08-20', 2);
 
--- invalid test (wrong date and guests)
-INSERT INTO bookings VALUES
-(6, '2026-11-01', '2025-11-05', 11);
+-- Invalid Test (check_out before check_in, too many guests)
+INSERT INTO bookings VALUES (6, '2026-11-01', '2025-11-05', 11);
 
 -- Task 2.1
+-- Demonstrate NOT NULL, CHECK, and TIMESTAMP constraints
+
 CREATE TABLE customers (
     customer_id INTEGER PRIMARY KEY NOT NULL,
-    email TEXT NOT NULL,
+    email TEXT NOT NULL, -- Must be provided
     phone TEXT,
     registration_date DATE NOT NULL
 );
 
 -- Task 2.2
+-- Demonstrate combining constraints
+
 CREATE TABLE inventory (
     item_id INTEGER PRIMARY KEY NOT NULL,
     item_name TEXT NOT NULL,
-    quantity INTEGER NOT NULL CHECK (quantity >= 0),
-    unit_price NUMERIC NOT NULL CHECK (unit_price > 0),
+    quantity INTEGER NOT NULL CHECK (quantity >= 0), -- Quantity non-negative
+    unit_price NUMERIC NOT NULL CHECK (unit_price > 0), -- Positive price
     last_updated TIMESTAMP NOT NULL
 );
 
 -- Task 2.3
+-- Valid and invalid inserts
+
 INSERT INTO customers VALUES
 (1, 'a.rom@example.com', '+7-701-111-2222', '2025-01-15'),
 (2, 'n.bek@example.com', NULL, '2025-03-05'),
@@ -87,9 +101,8 @@ INSERT INTO customers VALUES
 (4, 's.kz@example.com', '+7-701-333-4444', '2025-04-18'),
 (5, 'm.ali@example.com', NULL, '2025-05-25');
 
--- invalid test (missing email)
-INSERT INTO customers VALUES
-(6, NULL, '+7-700-000-0000', '2025-07-01');
+-- Invalid Test (email missing)
+INSERT INTO customers VALUES (6, NULL, '+7-700-000-0000', '2025-07-01');
 
 INSERT INTO inventory VALUES
 (1, 'Screwdriver', 150, 5.5, '2025-09-01 10:00:00'),
@@ -98,19 +111,22 @@ INSERT INTO inventory VALUES
 (4, 'Wrench', 70, 9.4, '2025-09-08 14:20:00'),
 (5, 'Pliers', 90, 8.6, '2025-09-10 11:45:00');
 
--- invalid test (negative quantity)
-INSERT INTO inventory VALUES
-(6, 'Broken Tool', -5, 10, '2025-09-12 10:00:00');
+-- Invalid Test (negative quantity)
+INSERT INTO inventory VALUES (6, 'Broken Tool', -5, 10, '2025-09-12 10:00:00');
 
 -- Task 3.1
+-- Demonstrates single column UNIQUE
+
 CREATE TABLE users (
     user_id INTEGER PRIMARY KEY,
     username TEXT NOT NULL,
     email TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT now()
+    created_at TIMESTAMP DEFAULT now() -- Automatically sets creation timestamp
 );
 
 -- Task 3.2
+-- Demonstrates multi-column UNIQUE
+
 CREATE TABLE course_enrollments (
     enrollment_id INTEGER PRIMARY KEY,
     student_id INTEGER NOT NULL,
@@ -127,6 +143,8 @@ INSERT INTO course_enrollments VALUES
 (5, 5, 'ENG101', 'Fall2025');
 
 -- Task 3.3
+-- Demonstrates named UNIQUE constraints
+
 ALTER TABLE users
     ADD CONSTRAINT unique_username UNIQUE (username),
     ADD CONSTRAINT unique_email UNIQUE (email);
@@ -138,11 +156,12 @@ INSERT INTO users VALUES
 (4, 'serik55', 'serik@example.com', now()),
 (5, 'dana01', 'dana@example.com', now());
 
--- testing duplicate username
-INSERT INTO users VALUES
-(6, 'aidar28', 'other@example.com', now());
+-- Invalid Test (duplicate username)
+INSERT INTO users VALUES (6, 'aidar28', 'other@example.com', now());
 
 -- Task 4.1
+-- Demonstrates single column primary key
+
 CREATE TABLE departments (
     dept_id INTEGER PRIMARY KEY,
     dept_name TEXT NOT NULL,
@@ -156,16 +175,19 @@ INSERT INTO departments VALUES
 (4, 'Marketing', 'Atyrau'),
 (5, 'Finance', 'Kostanay');
 
-INSERT INTO departments VALUES
-(1, 'Marketing', 'Astana'),
-(NULL, 'Marketing', 'Astana');
+-- Invalid: duplicate PRIMARY KEY or NULL key
+INSERT INTO departments VALUES (1, 'Marketing', 'Astana');
+INSERT INTO departments VALUES (NULL, 'Marketing', 'Astana');
+
 -- Task 4.2
+-- Demonstrates composite primary key
+
 CREATE TABLE student_courses (
     student_id INTEGER NOT NULL,
     course_id INTEGER NOT NULL,
     enrollment_date DATE,
     grade TEXT,
-    PRIMARY KEY (student_id, course_id)
+    PRIMARY KEY (student_id, course_id) -- Composite key: unique pair
 );
 
 INSERT INTO student_courses VALUES
@@ -176,16 +198,17 @@ INSERT INTO student_courses VALUES
 (5, 104, '2025-04-01', 'B');
 
 -- Task 4.3
--- Comparison Exercise
 -- UNIQUE allows multiple NULLs and ensures only uniqueness.
 -- PRIMARY KEY implies both NOT NULL and UNIQUE.
 -- A table can have multiple UNIQUE constraints but only one PRIMARY KEY.
 
 -- Task 5.1
+-- Demonstrates basic foreign key
+
 CREATE TABLE employees_dept (
     emp_id INTEGER PRIMARY KEY,
     emp_name TEXT NOT NULL,
-    dept_id INTEGER REFERENCES departments(dept_id),
+    dept_id INTEGER REFERENCES departments(dept_id), -- FK links to departments
     hire_date DATE
 );
 
@@ -196,11 +219,12 @@ INSERT INTO employees_dept VALUES
 (4, 'Aliya', 4, '2021-07-20'),
 (5, 'Murat', 5, '2020-11-30');
 
--- invalid foreign key test
-INSERT INTO employees_dept VALUES
-(6, 'Ghost', 999, '2025-01-01');
+-- Invalid FK Test (dept_id 999 does not exist)
+INSERT INTO employees_dept VALUES (6, 'Ghost', 999, '2025-01-01');
 
 -- Task 5.2
+-- Demonstrates multiple primary keys
+
 CREATE TABLE authors (
     author_id INTEGER PRIMARY KEY,
     author_name TEXT NOT NULL,
@@ -244,6 +268,8 @@ INSERT INTO books VALUES
 (5, 'Crime and Punishment', 5, 5, 1866, 'ISBN-5');
 
 -- Task 5.3
+-- Demonstrates ON DELETE options
+
 CREATE TABLE categories (
     category_id INTEGER PRIMARY KEY,
     category_name TEXT NOT NULL
@@ -262,7 +288,7 @@ CREATE TABLE orders (
 
 CREATE TABLE order_items (
     item_id INTEGER PRIMARY KEY,
-    order_id INTEGER REFERENCES orders(order_id) ON DELETE CASCADE,
+    order_id INTEGER REFERENCES orders(order_id) ON DELETE CASCADE, -- deletes child rows automatically
     product_id INTEGER REFERENCES products_fk(product_id),
     quantity INTEGER CHECK (quantity > 0)
 );
@@ -297,15 +323,14 @@ INSERT INTO order_items VALUES
 
 -- Test ON DELETE RESTRICT
 DELETE FROM categories WHERE category_id = 1;
--- There are rows in products_fk referencing it (ON DELETE RESTRICT prevents deletion).
-
+-- Fails: products_fk rows reference category_id = 1
 
 -- Test ON DELETE CASCADE
 DELETE FROM orders WHERE order_id = 1;
--- All related order_items with order_id = 1 are automatically deleted as well
--- due to ON DELETE CASCADE behavior.
+-- Success: related order_items with order_id = 1 are auto-deleted
 
--- Task 6.1
+-- Task 6.1: E-commerce Example (Complex FK relationships)
+
 CREATE TABLE products (
     product_id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
@@ -355,16 +380,13 @@ INSERT INTO order_details VALUES
 (4, 3, 4, 2, 59.00),
 (5, 4, 5, 1, 22.00);
 
--- Test invalid customer reference
-INSERT INTO orders_ecom VALUES
-(6, 999, '2025-09-10', 50, 'pending');
--- Because customer_id = 999 does not exist in the customers table.
+-- Invalid customer reference
+INSERT INTO orders_ecom VALUES (6, 999, '2025-09-10', 50, 'pending');
 
--- Test ON DELETE CASCADE for e-commerce
+-- ON DELETE CASCADE test
 DELETE FROM orders_ecom WHERE order_id = 1;
--- All related rows in order_details (order_id = 1) are automatically deleted
--- because of ON DELETE CASCADE.
+-- Related order_details automatically deleted
 
--- Test ON DELETE RESTRICT for e-commerce product
+-- ON DELETE RESTRICT test
 DELETE FROM products WHERE product_id = 1;
--- Because it is referenced in order_details (ON DELETE RESTRICT prevents deletion).
+-- Fails because product_id = 1 is referenced in order_details
