@@ -1,5 +1,5 @@
 -- Name: Alexey Romanov
--- Student ID: 202500123
+-- Student ID: 24B030265
 
 -- Task 1.1
 -- Demonstrates CHECK constraints for numeric ranges and salary
@@ -390,3 +390,4 @@ DELETE FROM orders_ecom WHERE order_id = 1;
 -- ON DELETE RESTRICT test
 DELETE FROM products WHERE product_id = 1;
 -- Fails because product_id = 1 is referenced in order_details
+
